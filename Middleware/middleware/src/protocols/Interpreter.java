@@ -7,6 +7,10 @@ package protocols;
 
 import interfaces.IExpression;
 import interpreter.TerminalExpression;
+import java.nio.charset.StandardCharsets;
+import constants.Constants;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  *
@@ -14,53 +18,84 @@ import interpreter.TerminalExpression;
  */
 public class Interpreter {
 
-    private IExpression isFormatA;
-    private IExpression isFormatB;
-    
+    private IExpression isFixedFormat;
+    private IExpression isDelimFormat;
+
     public Interpreter() {
-        isFormatA = getStudentAExpression();
-        isFormatB = getStudentBExpression();
+        isFixedFormat = getFixedFrameExpression();
+        isDelimFormat = getDelimFrameExpression();
     }
 
-    public String interpret(String unknownFormat) {
-        if (isFormatA.interpret(unknownFormat)) {
-            return parseToFormatB(unknownFormat);
-        } else if (isFormatB.interpret(unknownFormat)) {
-            return parseToFormatA(unknownFormat);
+    public Object interpret(byte[] byteArray) {//int typeToParse
+        String unknownFormat = new String(byteArray, StandardCharsets.UTF_8);
+        if (isFixedFormat.interpret(unknownFormat)) {
+            System.out.println("Fixed Format");
+            parseToNeutral(unknownFormat, Constants.FIXED_FRAME);
+            System.out.println(Arrays.toString(parseToNeutral(unknownFormat, Constants.FIXED_FRAME)));
+        } else if (isDelimFormat.interpret(unknownFormat)) {
+            System.out.println("Delimited Format");
+
         } else {
+            System.out.println("Nada");
+            
             return null;
         }
+//        if (isFixedFormat.interpret(unknownFormat)) {
+//            return parseToDelimFrame(unknownFormat);
+//        } else if (isDelimFormat.interpret(unknownFormat)) {
+//            return parseToFixedFrame(unknownFormat);
+//        } else {
+//            return null;
+//        }
+        return null;
     }
 
-    private IExpression getStudentAExpression() {
-        IExpression studentA = new TerminalExpression("[\\w áéíóúÁÉÍÓÚ]*[|]{1}[\\w]*[|]{1}[\\d]*[|]{1}[\\w áéíóúÁÉÍÓÚ#\\d]*[|]{1}[\\d]*[|]{1}[truefals]*");
+    private IExpression getFixedFrameExpression() {
+        IExpression studentA = new TerminalExpression("(?i)"
+                + "[a-z " + Constants.FILLING_CHARACTER + "]{50}"
+                + "(masculino|femenino[" + Constants.FILLING_CHARACTER + "])"
+                + "([\\d]{2}|[\\d]{1}[" + Constants.FILLING_CHARACTER + "]{1})"
+                + "[\\w #" + Constants.FILLING_CHARACTER + ".]{20}"
+                + "[\\d*]{10}"
+                + "(true[" + Constants.FILLING_CHARACTER + "]|false){1}");
         return studentA;
     }
 
-    private IExpression getStudentBExpression() {
-        IExpression studentB = new TerminalExpression("[\\w áéíóúÁÉÍÓÚ]*[|]{1}[\\w áéíóúÁÉÍÓÚ]*[|]{1}[\\w áéíóúÁÉÍÓÚ]*[|]{1}[\\w áéíóúÁÉÍÓÚ]*[|]{1}[\\d]*[|]{1}[\\d][|]{1}[\\d.]*[|]{1}[A-Z]*");
+    private IExpression getDelimFrameExpression() {
+        IExpression studentB = new TerminalExpression("");//Se necesita la expresión regular
         return studentB;
     }
 
-    private String parseToFormatB(String format) {
-        String[] studentInfo = format.split("\\|");
-        return studentInfo[0].substring(0, studentInfo[0].indexOf(" ", studentInfo[0].indexOf(" ") + 1)).trim() + "|"
-                + studentInfo[0].substring(studentInfo[0].indexOf(" ", studentInfo[0].indexOf(" ") + 1)).trim() + "|"
-                + "Indefinido" + "|"
-                + studentInfo[3] + "|"
-                + studentInfo[2] + "|"
-                + "-1" + "|"
-                + "-1" + "|"
-                + "Indefinido" + "|";
+    private Object[] parseToNeutral(String data, int formatType) {
+        ArrayList<String> neutralFormat = new ArrayList<>();
+
+        switch (formatType) {
+            case Constants.FIXED_FRAME:
+                int[] fixedLengths = {Constants.FULL_NAME_FIXED_LENGTH, Constants.SEX_FIXED_LENGTH, Constants.AGE_FIXED_LENGTH, Constants.ADDRESS_FIXED_LENGTH, Constants.CELL_PHONE_NUMBER_FIXED_LENGTH, Constants.WORK_FIXED_LENGTH};
+                for (int i = 0; i < fixedLengths.length; i++) {
+                    neutralFormat.add(data.substring(0, fixedLengths[i]).replaceAll("[" + Character.toString(Constants.FILLING_CHARACTER) + "]", ""));
+                    data = data.substring(fixedLengths[i]);
+                }
+                break;
+            case Constants.DELIM_FRAME:
+
+                break;
+            case Constants.GSON_FRAME:
+
+                break;
+        }
+        return neutralFormat.toArray();
     }
 
-    private String parseToFormatA(String format) {
-        String[] studentInfo = format.split("\\|");
-        return studentInfo[0] + " " + studentInfo[1] + "|"
-                + "Indefinido" + "|"
-                + studentInfo[4] + "|"
-                + studentInfo[3] + "|"
-                + "-1" + "|"
-                + "Indefinido";
+    private byte[] parseToFixedFrame(String[] data) {
+        return null;
+    }
+
+    private byte[] parseToDelimFrame(String[] data) {
+        return null;
+    }
+
+    private String parseToGson(String[] data) {
+        return null;
     }
 }

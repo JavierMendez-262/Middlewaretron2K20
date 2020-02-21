@@ -5,13 +5,13 @@
  */
 package presentacion;
 
-import datos.*;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import logicaNegocios.DataPackager;
 import objetosNegocio.Student;
-import sockets.ClientSocketData;
+
 
 /**
  *
@@ -28,15 +28,11 @@ public class InterfazGrafica extends javax.swing.JDialog {
         setLocationRelativeTo(null);
 
         try {
-            cliente = new ClientSocketData(hostName, portNumber);
+            empaquetador = new DataPackager();
         } catch (IOException ex) {
-            System.err.println("No se puede obtener I/O para la conexión a " + hostName);
-            System.exit(1);
+            Logger.getLogger(InterfazGrafica.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-        transferor = new DataTransferor(cliente);
-        receptor = new DataReceptor(cliente);
-
+        
         esperarDatos();
     }
 
@@ -205,7 +201,7 @@ public class InterfazGrafica extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void botonCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonCancelarActionPerformed
-        System.exit(0);
+        System.exit(1);
     }//GEN-LAST:event_botonCancelarActionPerformed
 
     private void botonEnviarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonEnviarActionPerformed
@@ -217,19 +213,25 @@ public class InterfazGrafica extends javax.swing.JDialog {
                 checkBoxWork.isSelected());
 
         try {
-            transferor.sendData(estudiante);
+            empaquetador.sendPackage(estudiante);
         } catch (IOException ex) {
             Logger.getLogger(InterfazGrafica.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_botonEnviarActionPerformed
 
     private void esperarDatos() {
-        Thread hilo = new Thread(receptor);
+        Thread hilo = new Thread(empaquetador);
         hilo.start();
     }
 
-    public static void ventanaEmergente(String estudiante) {
-        new JOptionPane().showMessageDialog(null, estudiante);
+    public static void ventanaEmergente(Student estudiante) {
+        String estudianteFormato = "Nombre: " + estudiante.getFullName() + "\n"
+                    + "Sexo: " + estudiante.getSex() + "\n"
+                    + "Edad: " + estudiante.getAge() + "\n"
+                    + "Dirección: " + estudiante.getAddress() + "\n"
+                    + "Teléfono: " + estudiante.getCellPhoneNumber() + "\n"
+                    + "Trabaja: " + (estudiante.isCurrentlyWorking()? "Sí" : "No");
+        new JOptionPane().showMessageDialog(null, estudianteFormato);
     }
 
     /**
@@ -274,12 +276,8 @@ public class InterfazGrafica extends javax.swing.JDialog {
             }
         });
     }
-
-    private String hostName = "localhost";
-    private int portNumber = 777;
-    private ClientSocketData cliente;
-    private DataTransferor transferor;
-    private DataReceptor receptor;
+    
+    private DataPackager empaquetador;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton botonCancelar;
     private javax.swing.JButton botonEnviar;

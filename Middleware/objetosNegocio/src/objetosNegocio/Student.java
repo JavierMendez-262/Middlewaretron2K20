@@ -19,7 +19,13 @@ public class Student {
     private String cellPhoneNumber;
     private boolean work;
     
-    public Student() {   
+    public Student() {
+        this.fullName = "Indefinido";
+        this.sex = "Indefinido";
+        this.age = -1;
+        this.address = "Indefinido";
+        this.cellPhoneNumber = "Indefinido";
+        this.work = false;
     }
     
     public Student(String fullName, String sex, byte age, String address, String cellPhoneNumber, boolean work) {
@@ -77,7 +83,7 @@ public class Student {
         this.cellPhoneNumber = cellPhoneNumber;
     }
 
-    public boolean isWork() {
+    public boolean isCurrentlyWorking() {
         return work;
     }
 
@@ -85,10 +91,8 @@ public class Student {
         this.work = work;
     }
 
-    
-
     @Override
     public String toString() {
-        return "Student{" + "fullName=" + fullName + ", sexo=" + sex + ", age=" + age + ", address=" + address + ", cellPhoneNumber=" + cellPhoneNumber + ", work=" + work + '}';
+        return "Student{" + "fullName=" + fullName + ", sex=" + sex + ", age=" + age + ", address=" + address + ", cellPhoneNumber=" + cellPhoneNumber + ", work=" + work + '}';
     }
 }
