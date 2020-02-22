@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import constants.Constants;
+import java.io.ObjectOutputStream;
 
 /**
  *
@@ -30,27 +31,24 @@ public class FixedFramer implements Framer{
         if(message.length != Constants.FIXED_MAX_LENGTH) {
             throw new IOException("Message doesn't match the fixed length");
         }
-        //Send who is going to receive the message
         out.write(message.length);
         out.write(message);
         out.flush();
     }
 
+    public void frameMsg(String message, OutputStream out) throws IOException {
+        //Send who is going to receive the message
+        new ObjectOutputStream(out).writeObject(message + Constants.FIXED_FRAME);
+        out.flush();
+    }
+    
     @Override
     public byte[] nextMsg() throws IOException {
         ByteArrayOutputStream messageBuffer = new ByteArrayOutputStream();
         int nextByte;
         
         for (int i = 0; i < Constants.FIXED_MAX_LENGTH; i++) {
-            nextByte = in.read(); //Talvés cause errores
-            if (nextByte == -1) {
-                if (messageBuffer.size() == 0) {
-                    return null;
-                } else {
-                    System.out.println("FixedFramer.java -49");
-                    throw new EOFException("Non-empty message without delimiter");
-                }
-            }
+            nextByte = in.read();
             messageBuffer.write(nextByte);
         }
         return messageBuffer.toByteArray();

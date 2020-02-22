@@ -33,6 +33,7 @@ public class InterfazGrafica extends javax.swing.JDialog {
             Logger.getLogger(InterfazGrafica.class.getName()).log(Level.SEVERE, null, ex);
         }
         
+        darNombre();
         esperarDatos();
     }
 
@@ -212,7 +213,10 @@ public class InterfazGrafica extends javax.swing.JDialog {
                 textFieldCellPhoneNumber.getText(),
                 checkBoxWork.isSelected());
 
+                String destinatario = JOptionPane.showInputDialog("Destinatario:");
+        
         try {
+            empaquetador.sendPackage(destinatario);
             empaquetador.sendPackage(estudiante);
         } catch (IOException ex) {
             Logger.getLogger(InterfazGrafica.class.getName()).log(Level.SEVERE, null, ex);
@@ -222,6 +226,15 @@ public class InterfazGrafica extends javax.swing.JDialog {
     private void esperarDatos() {
         Thread hilo = new Thread(empaquetador);
         hilo.start();
+    }
+    
+    private void darNombre() {
+        try {
+            String nombre = JOptionPane.showInputDialog("Identificador:");
+            empaquetador.sendPackage(nombre);
+        } catch (IOException ex) {
+            Logger.getLogger(InterfazGrafica.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     public static void ventanaEmergente(Student estudiante) {

@@ -36,6 +36,10 @@ public class DataPackager implements Runnable {
 
         fixedFramer.frameMsg(byteArray, clientSocket.getOutputStream());
     }
+    
+    public void sendPackage(String name) throws IOException {
+        fixedFramer.frameMsg(name, clientSocket.getOutputStream());
+    }
 
     public void run() {
         byte[] byteArray = null;

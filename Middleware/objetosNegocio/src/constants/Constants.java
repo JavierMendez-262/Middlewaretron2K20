@@ -20,6 +20,8 @@ public class Constants {
     public static final byte WORK_FIXED_LENGTH = 5;
     public static final char FILLING_CHARACTER = '*';
     
+    public static final char DELIM_CHARACTER = '|';
+    
     public static final byte FIXED_FRAME = 0;
     public static final byte DELIM_FRAME = 1;
     public static final byte GSON_FRAME = 2;
