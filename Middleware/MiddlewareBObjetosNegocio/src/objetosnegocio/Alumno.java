@@ -18,10 +18,6 @@ public class Alumno {
     public float promedio;
     public String carrera;
 
-    public Alumno() {
-
-    }
-
     public Alumno(String nombre, String apellido, String nombreTutor, String direccion, int edad, int semestre, float promedio, String carrera) {
         this.nombre = nombre;
         this.apellido = apellido;
@@ -31,6 +27,17 @@ public class Alumno {
         this.semestre = semestre;
         this.promedio = promedio;
         this.carrera = carrera;
+    }
+
+    public Alumno() {
+        this.nombre = "Indefinido";
+        this.apellido = "Indefinido";
+        this.nombreTutor = "Indefinido";
+        this.direccion = "Indefinido";
+        this.edad = -1;
+        this.semestre = -1;
+        this.promedio = -1;
+        this.carrera = "Indefinido";
     }
 
     public String getNombre() {

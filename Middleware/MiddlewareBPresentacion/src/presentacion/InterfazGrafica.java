@@ -3,13 +3,12 @@
  */
 package presentacion;
 
-import objetosnegocio.*;
-import datos.*;
+import negocio.EmpaquetaDatos;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
-import sockets.ClientSocketData;
+import objetosnegocio.Alumno;
 
 /**
  *
@@ -17,23 +16,23 @@ import sockets.ClientSocketData;
  */
 public class InterfazGrafica extends javax.swing.JFrame {
 
+    private EmpaquetaDatos empaquetador;
+
     /**
      * Creates new form MiddlewareBPresentacion
      */
     public InterfazGrafica() {
         super();
+        initComponents();
+        setLocationRelativeTo(null);
+
         try {
-            initComponents();
-            setLocationRelativeTo(null);
-            
-            client = new ClientSocketData(hostname, port);
-            transferencia = new TransferenciaDatos(client);
-            recepcion = new RecepcionDatos(client);
-            
-            esperarDatos();
+            empaquetador = new EmpaquetaDatos();
         } catch (IOException ex) {
             Logger.getLogger(InterfazGrafica.class.getName()).log(Level.SEVERE, null, ex);
         }
+        darNombre();
+        esperarDatos();
     }
 
     /**
@@ -257,7 +256,7 @@ public class InterfazGrafica extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void esperarDatos() {
-        Thread hilo = new Thread(recepcion);
+        Thread hilo = new Thread(empaquetador);
         hilo.start();
     }
 
@@ -296,17 +295,36 @@ public class InterfazGrafica extends javax.swing.JFrame {
     private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
         System.exit(0);
     }//GEN-LAST:event_btnCancelarActionPerformed
-    
-    public static void ventanaEmergente(String alumno) {
-        new JOptionPane().showMessageDialog(null, alumno);
+
+    public static void ventanaEmergente(Alumno alumno) {
+        String alumnoFormato = "Nombre: " + alumno.getNombre() + "\n"
+                + "Apellido: " + alumno.getApellido() + "\n"
+                + "Nombre de tutor: " + alumno.getNombreTutor() + "\n"
+                + "Dirección: " + alumno.getDireccion() + "\n"
+                + "Edad: " + alumno.getEdad() + "\n"
+                + "Semestre: " + alumno.getSemestre() + "\n"
+                + "Promedio: " + alumno.getPromedio() + "\n"
+                + "Carrera: " + alumno.getCarrera();
+        new JOptionPane().showMessageDialog(null, alumnoFormato);
     }
-    
+
+    private void darNombre() {
+        try {
+            String nombre = JOptionPane.showInputDialog("Escribe tu nombre");
+            empaquetador.enviaDatos(nombre);
+        } catch (IOException ex) {
+            Logger.getLogger(InterfazGrafica.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
     private void btnEnviarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEnviarActionPerformed
         Alumno alumno = new Alumno(campoNombre.getText(), campoApellido.getText(), campoNombreTutor.getText(),
                 campoDireccion.getText(), Integer.parseInt(campoEdad.getText()), Integer.parseInt(campoSemestre.getText()),
                 Float.parseFloat(campoPromedio.getText()), campoCarrera.getText());
+        String nombre = JOptionPane.showInputDialog("Destinatario:");
         try {
-            transferencia.enviaDatos(alumno);
+            empaquetador.enviaDatos(nombre);
+            empaquetador.enviaDatos(alumno);
         } catch (IOException ex) {
             Logger.getLogger(InterfazGrafica.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -361,12 +379,6 @@ public class InterfazGrafica extends javax.swing.JFrame {
             }
         });
     }
-
-    private String hostname = "189.192.194.192";
-    private int port = 777;
-    private ClientSocketData client;
-    private TransferenciaDatos transferencia;
-    private RecepcionDatos recepcion;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancelar;
